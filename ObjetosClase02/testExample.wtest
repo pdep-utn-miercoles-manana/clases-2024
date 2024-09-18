@@ -1,0 +1,16 @@
+import pepe.*
+
+test "Cuando pepe es desarrollador y tiene bono presentismo nulo y bono por resultado fijo" {
+  pepe.puesto(desarrollador)
+  pepe.bonoPresentismo(bonoPresentismoNulo)
+  pepe.bonoResultado(bonoResultadoFijo)
+  assert.equals(1041, pepe.sueldo())
+}
+
+test "Cuando pepe es desarrollador y tiene bono presentismo por faltas teniendo cero faltas y bono por resultado fijo" {
+  pepe.faltas(0)
+  pepe.puesto(desarrollador)
+  pepe.bonoPresentismo(bonoPresentismoPorFaltas)
+  pepe.bonoResultado(bonoResultadoFijo)
+  assert.equals(1141, pepe.sueldo())
+}
