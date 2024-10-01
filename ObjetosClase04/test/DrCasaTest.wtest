@@ -1,0 +1,132 @@
+import src.personas.Persona.*
+import src.personas.Medico.*
+import src.personas.JefeDeDepartamento.*
+import src.enfermedades.EnfermedadAutoinmune.*
+import src.enfermedades.EnfermedadInfecciosa.*
+
+describe "Dr Casa - Temporada 1" {
+
+  const otitis100 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 100)
+  const malaria500 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 500)
+  const malaria800 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 800)
+  const lupus10000 = new EnfermedadAutoinmune(cantidadCelulasAmenazadas = 10000)
+
+  const frank = new Persona(temperatura = 36, cantidadCelulas = 3000000)
+  const logan = new Persona(temperatura = 36, cantidadCelulas = 3500000)
+
+  method initialize() {
+    frank.contraerEnfermedad(malaria800)
+    
+    logan.contraerEnfermedad(otitis100)
+    logan.contraerEnfermedad(malaria500)
+    logan.contraerEnfermedad(lupus10000)
+  }
+
+  test "1. Cuando Frank contrae una enfermedad esta se agrega a sus enfermedades" {
+    assert.that(frank.tiene(malaria800))
+  }
+
+  test "2. Cuando una enfermedad infecciosa se reproduce duplica su cantidad de celulas amenazadas" {
+    malaria500.reproducirse()
+
+    assert.equals(1000, malaria500.cantidadCelulasAmenazadas())
+  }
+
+  test "3.a Logan vive un día estando enfermo y aumenta la cantidad total de celulas afectadas por enfermedades agresivas" {
+    logan.vivir(1)
+
+    assert.equals(0, logan.cantidadCelulasAfectadasPorEnfermedadesAgresivas())
+  }
+
+  test "3.b Logan vive un día estando enfermo y la enfermedad de logan que más celulas afecta es el lupus" {
+    logan.vivir(1)
+
+    assert.equals(lupus10000, logan.enfermedadQueMasCelulasAfecta())
+  }
+
+  test "3.c Logan vive un día estando enfermo y logan no está en coma" {
+    logan.vivir(1)
+
+    assert.notThat(logan.estaEnComa())
+  }
+
+  test "4.a Logan vive 31 días estando enfermo y aumenta la cantidad total de celulas afectadas por enfermedades agresivas" {
+    logan.vivir(31)
+
+    assert.equals(10000, logan.cantidadCelulasAfectadasPorEnfermedadesAgresivas())
+  }
+
+  test "4.b Logan vive 31 días estando enfermo y la enfermedad de logan que más celulas afecta es el lupus" {
+    logan.vivir(31)
+
+    assert.equals(lupus10000, logan.enfermedadQueMasCelulasAfecta())
+  }
+
+  test "4.c Logan vive 31 días estando enfermo y logan no está en coma" {
+    logan.vivir(31)
+
+    assert.that(logan.estaEnComa())
+  }
+}
+
+describe "Dr Casa - Temporada 2" {
+
+  const otitis100 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 100)
+  const malaria500 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 500)
+  const malaria800 = new EnfermedadInfecciosa(cantidadCelulasAmenazadas = 800)
+  const lupus10000 = new EnfermedadAutoinmune(cantidadCelulasAmenazadas = 10000)
+  const lupus15000 = new EnfermedadAutoinmune(cantidadCelulasAmenazadas = 15000)
+
+  const frank = new Persona(temperatura = 36, cantidadCelulas = 3000000)
+  const logan = new Persona(temperatura = 36, cantidadCelulas = 3500000)
+  const cameron = new Medico(dosis = 10, temperatura = 36.5, cantidadCelulas = 3100000)
+  const house = new JefeDeDepartamento(temperatura = 36.5, cantidadCelulas = 3100000)
+
+  method initialize() {
+    frank.contraerEnfermedad(malaria800)
+    
+    logan.contraerEnfermedad(otitis100)
+    logan.contraerEnfermedad(malaria500)
+    logan.contraerEnfermedad(lupus10000)
+
+    house.agregarSubordinado(cameron)
+  }
+
+  test "1.a Una enfermedad infecciosa se atenua bien" {
+    malaria500.atenuarse(100)
+    
+    assert.equals(400, malaria500.cantidadCelulasAmenazadas())
+  }
+
+  test "1.b Una enfermedad autoinmune se atenua bien" {
+    lupus10000.atenuarse(500)
+    
+    assert.equals(9500, lupus10000.cantidadCelulasAmenazadas())
+  }
+
+  test "2.a Un médico atiende correctamente" {
+    cameron.atenderA(logan)
+
+    assert.equals(350, malaria500.cantidadCelulasAmenazadas())
+  }
+
+  test "2.b Un médico atiende correctamente" {
+    cameron.atenderA(logan)
+
+    assert.equals(9850, lupus10000.cantidadCelulasAmenazadas())
+  }
+  
+  test "2.c Un médico cura una otitis" {
+    cameron.atenderA(logan)
+
+    assert.notThat(logan.tiene(otitis100))
+  }
+
+  test "3. Jefe de departamento atiende a una persona" {
+    cameron.contraerEnfermedad(lupus15000)
+
+    house.atenderA(cameron)
+
+    assert.equals(14700, lupus15000.cantidadCelulasAmenazadas())
+  }
+}
