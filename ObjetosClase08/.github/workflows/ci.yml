@@ -1,0 +1,14 @@
+name: build
+
+on: [push, pull_request]
+jobs:
+  wollok-ts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          wget -O wollok-ts-cli https://github.com/uqbar-project/wollok-ts-cli/releases/latest/download/wollok-ts-cli-linux-x64
+          chmod a+x ./wollok-ts-cli
+          ./wollok-ts-cli test --skipValidations -p ./
+        shell: bash
